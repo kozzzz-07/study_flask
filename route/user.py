@@ -8,4 +8,5 @@ user_bp = Blueprint("user", __name__)
 def get_users():
     user_service = UserService()
     users = user_service.get_users()
-    return jsonify(users)
+    # Pydanticモデルを辞書に変換してからJSONにする
+    return jsonify([user.model_dump() for user in users])

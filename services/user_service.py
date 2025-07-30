@@ -1,10 +1,11 @@
+from domain.user_domain import User
 from infra.repository.user_repository import UserRepository
 
 
-class UserService():
+class UserService:
     def __init__(self):
         self.user_repository = UserRepository()
 
-    def get_users(self):
+    def get_users(self) -> list[User]:
         return self.user_repository.get_users()
         

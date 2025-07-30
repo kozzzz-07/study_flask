@@ -1,9 +1,9 @@
-from dataclasses import dataclass
+from typing import Optional
+from pydantic import BaseModel, Field
 
 
-@dataclass
-class User:
+class User(BaseModel):
     id: int
-    name: str
-    age: int
-    nickname: str = None
+    name: str = Field(..., min_length=1)
+    age: int = Field(..., ge=0)
+    nickname: Optional[str] = None
