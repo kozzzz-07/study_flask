@@ -1,7 +1,6 @@
 from flask import Blueprint, request
 from markupsafe import escape
 
-
 hello_bp = Blueprint("hello", __name__)
 
 

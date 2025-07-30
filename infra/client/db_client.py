@@ -10,9 +10,9 @@ DATABASE = "database.db"
 def get_db():
     db = getattr(g, "_database", None)
     if db is None:
-        conn = g._database = sqlite3.connect(DATABASE)
-        conn.row_factory = sqlite3.Row
-    return conn
+        db = g._database = sqlite3.connect(DATABASE)
+        db.row_factory = sqlite3.Row
+    return db
 
 
 @db_bp.teardown_app_request
@@ -44,5 +44,3 @@ def init_db():
     if user_count == 0:
         conn.execute("INSERT INTO user (name, age) VALUES (?, ?)", ("test", 20))
         conn.commit()
-
-    conn.close()
