@@ -2,7 +2,7 @@ import pytest
 from flask import Flask
 from unittest.mock import patch
 from route.user import user_bp
-from domain.user_domain import User
+from application.ports.user_dto import UserResponse  # DTOをインポート
 
 
 @pytest.fixture
@@ -14,21 +14,21 @@ def client():
 
 
 def test_get_users(client):
-    # Userモデルのインスタンスを作成
-    mock_users_data = [
-        User(id=1, name="John Doe", age=30, nickname=None),
-        User(id=2, name="Jane Smith", age=25, nickname="Janey"),
+    # UserServiceが返すダミーのDTOリストを作成
+    mock_dtos = [
+        UserResponse(id=1, name="DTO User 1", age=30, nickname="Dto1"),
+        UserResponse(id=2, name="DTO User 2", age=25, nickname="Dto2"),
     ]
     # レスポンスの期待値（JSONになるデータ）
     expected_json = [
-        {"id": 1, "name": "John Doe", "age": 30, "nickname": None},
-        {"id": 2, "name": "Jane Smith", "age": 25, "nickname": "Janey"},
+        {"id": 1, "name": "DTO User 1", "age": 30, "nickname": "Dto1"},
+        {"id": 2, "name": "DTO User 2", "age": 25, "nickname": "Dto2"},
     ]
 
-    with patch("route.user.UserService") as MockUserService:
-        # モックはUserモデルのリストを返すように設定
-        MockUserService.return_value.get_users.return_value = mock_users_data
-        response = client.get("/users")
+    with patch('route.user.UserService') as MockUserService:
+        # モックはDTOのリストを返すように設定
+        MockUserService.return_value.get_users.return_value = mock_dtos
+        response = client.get('/users')
 
         assert response.status_code == 200
         assert response.json == expected_json
