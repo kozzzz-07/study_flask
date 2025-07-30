@@ -24,8 +24,9 @@ def close_connection(exception):
 
 # テスト用に初回リクエスト時にテーブルを作成
 @db_bp.before_app_request
-def create_table():
+def init_db():
     conn = get_db()
+    # テーブル作成
     conn.execute("""
         CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,5 +35,14 @@ def create_table():
             nickname TEXT
         )
     """)
-    conn.commit()
+
+    # userがいない場合、テストユーザーを作成
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM user")
+    user_count = cursor.fetchone()[0]
+
+    if user_count == 0:
+        conn.execute("INSERT INTO user (name, age) VALUES (?, ?)", ("test", 20))
+        conn.commit()
+
     conn.close()
