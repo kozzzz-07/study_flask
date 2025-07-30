@@ -25,9 +25,11 @@ def test_get_users(client):
         {"id": 2, "name": "DTO User 2", "age": 25, "nickname": "Dto2"},
     ]
 
-    with patch('route.user.UserService') as MockUserService:
-        # モックはDTOのリストを返すように設定
-        MockUserService.return_value.get_users.return_value = mock_dtos
+    with patch('route.user.get_user_service') as MockGetUserService:
+        # get_user_serviceが返すモックのUserServiceインスタンスを作成
+        mock_user_service_instance = MockGetUserService.return_value
+        # そのモックインスタンスのget_usersメソッドがDTOのリストを返すように設定
+        mock_user_service_instance.get_users.return_value = mock_dtos
         response = client.get('/users')
 
         assert response.status_code == 200

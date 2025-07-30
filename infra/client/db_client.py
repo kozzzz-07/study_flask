@@ -43,4 +43,8 @@ def init_db():
 
     if user_count == 0:
         conn.execute("INSERT INTO user (name, age) VALUES (?, ?)", ("test", 20))
+        conn.execute(
+            "INSERT INTO user (name, age, nickname) VALUES (?, ?, ?)",
+            ("test2", 22, "2"),
+        )
         conn.commit()

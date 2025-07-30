@@ -15,12 +15,12 @@ def test_get_users_with_mock():
 
     # 2. Act: テスト対象の処理を実行
     # `services.user_service.UserRepository` をモックに差し替える
-    with patch("services.user_service.UserRepository") as MockUserRepository:
+    with patch("services.user_service.IUserRepository") as MockUserRepository:
         # モックの設定: get_usersが呼ばれたらダミーデータを返すようにする
         MockUserRepository.return_value.get_users.return_value = mock_domain_users
 
         # テスト対象のクラスとメソッドを呼び出す
-        user_service = UserService()
+        user_service = UserService(MockUserRepository.return_value)
         result_dtos = user_service.get_users()
 
     # 3. Assert: 結果の検証

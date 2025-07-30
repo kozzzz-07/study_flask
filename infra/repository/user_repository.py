@@ -1,11 +1,13 @@
+from application.ports.user_repository_port import IUserRepository
 from domain.user_domain import User
-from infra.client.db_client import get_db
 
 
-class UserRepository:
+class UserRepository(IUserRepository):
+    def __init__(self, db):
+        self.db = db
+
     def get_users(self, limit=100) -> list[User]:
-        db = get_db()
-        cursor = db.execute(
+        cursor = self.db.execute(
             "SELECT id, name, age, nickname FROM user LIMIT ?", (limit,)
         )
         users = cursor.fetchall()
