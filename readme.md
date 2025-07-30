@@ -6,3 +6,7 @@
 ## run
 
 - `flask --app app run`
+
+## test
+- `python -m pytest`
+  - https://flask.palletsprojects.com/en/stable/testing/
