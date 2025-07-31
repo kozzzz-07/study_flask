@@ -2,6 +2,7 @@ import logging
 import os
 import structlog
 from colorama import init as colorama_init
+import sys
 
 
 def setup_logging():
@@ -11,18 +12,25 @@ def setup_logging():
     それ以外の場合はJSON形式で出力します。
     """
 
-    # 環境変数をチェック
-    is_development = os.environ.get("IS_DEBUG") == "true"
+    # 標準のlogging設定
+    logging.basicConfig(
+        format="%(message)s",
+        stream=sys.stdout,
+        level=logging.INFO,
+    )
 
     processors = [
         structlog.contextvars.merge_contextvars,
+        structlog.stdlib.add_logger_name,
         structlog.processors.add_log_level,
         structlog.processors.StackInfoRenderer(),
         structlog.dev.set_exc_info,
+        structlog.processors.format_exc_info,
         structlog.processors.TimeStamper(fmt="iso"),
     ]
 
-    if is_development:
+    # 環境変数をチェック
+    if os.environ.get("IS_DEBUG") == "true":
         colorama_init()  # coloramaを初期化
         processors.append(structlog.dev.ConsoleRenderer())
     else:
@@ -32,7 +40,7 @@ def setup_logging():
         processors=processors,
         wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
         context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(),
+        logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
 

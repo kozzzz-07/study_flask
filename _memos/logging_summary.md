@@ -65,7 +65,7 @@ def some_business_logic(user_id: int):
 環境変数 `IS_DEBUG` を `true` に設定することで、開発環境向けのログ出力が有効になります。
 
 *   **色付きコンソール出力**: `colorama` を使用して、ログレベルに応じた色付きの出力が行われます。
-*   **詳細なトレースバック**: エラー発生時に `logger.error(..., exc_info=True)` とすることで、詳細なスタックトレースがログに含まれます。
+*   **詳細なトレースバック**: `structlog.processors.format_exc_info` の追加により、`logger.error(..., exc_info=True)` とすることで、詳細なスタックトレースがログに含まれるようになりました。JSON形式のログでは `exception` フィールドに、コンソール出力では独立した行として表示されます。
 
 **設定方法:**
 .env
@@ -94,13 +94,30 @@ IS_DEBUG=true
 }
 ```
 
+エラー発生時のログ例 (`IS_DEBUG=false` の場合):
+
+```json
+{
+  "event": "予期せぬエラーが発生しました。",
+  "logger": "services.some_service",
+  "level": "error",
+  "exception": "Traceback (most recent call last):\n  File \"/path/to/your/code.py\", line XX, in some_business_logic\n    result = 1 / 0\nZeroDivisionError: division by zero",
+  "timestamp": "2025-07-31T02:02:27.426515Z",
+  "request_id": "5cc4e956-aa49-4164-a6e5-6e53cb0505ef",
+  "remote_addr": "127.0.0.1",
+  "method": "GET",
+  "path": "/error"
+}
+```
+
 `IS_DEBUG=true` の場合のエラーログ例:
 
 ```
-[error    ] ZeroDivisionErrorが発生しました。      method=GET path=/error remote_addr=127.0.0.1 request_id=XXXX
+[error    ] 予期せぬエラーが発生しました。      method=GET path=/error remote_addr=127.0.0.1 request_id=XXXX
 Traceback (most recent call last):
   File "/Users/koz/Documents/my-ws/study/python/learn-flask/app.py", line XX, in trigger_error
     1 / 0  # ZeroDivisionErrorを意図的に発生させる
     ~~^~~
 ZeroDivisionError: division by zero
+```
 ```
