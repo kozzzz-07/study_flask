@@ -22,3 +22,15 @@ class UserRepository(IUserRepository):
 
         logger.info(f"Fetched users: {len(users)}")
         return [User(**dict(row)) for row in users]
+
+    @log_errors(logger_name=__name__)
+    def add_user(self, user: User) -> User:
+        logger.info(f"Adding user: {user.name}")
+        cursor = self.db.execute(
+            "INSERT INTO user (name, age, nickname) VALUES (?, ?, ?)",
+            (user.name, user.age, user.nickname),
+        )
+        self.db.commit()
+        user.id = cursor.lastrowid
+        logger.info(f"User added with ID: {user.id}")
+        return user

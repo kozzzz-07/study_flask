@@ -7,6 +7,7 @@ db_bp = Blueprint("db_bp", __name__)
 DATABASE = "database.db"
 
 
+# リクエストごとにDBコネクション
 def get_db():
     db = getattr(g, "_database", None)
     if db is None:

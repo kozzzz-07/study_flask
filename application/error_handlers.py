@@ -2,6 +2,7 @@ from flask import jsonify
 from werkzeug.exceptions import HTTPException
 from application.exceptions import ApplicationError
 from utils.logging import get_logger
+from pydantic import ValidationError # PydanticのValidationErrorをインポート
 
 logger = get_logger(__name__)
 
@@ -19,7 +20,13 @@ def register_error_handlers(app):
         response.status_code = error.code
         return response
 
-    # 2. WerkzeugのHTTPExceptionのハンドリング（404, 405, 500など）
+    # 2. PydanticのValidationErrorのハンドリング
+    @app.errorhandler(ValidationError)
+    def handle_validation_error(e):
+        logger.warning(f"Pydantic validation error caught: {e.errors()}", exc_info=True)
+        return jsonify({"error": "Validation Error", "details": e.errors()}), 400
+
+    # 3. WerkzeugのHTTPExceptionのハンドリング（404, 405, 500など）
     # これにより、Flaskが自動的に発生させるHTTPエラーもJSONで返せる
     @app.errorhandler(HTTPException)
     def handle_http_exception(e):
@@ -33,7 +40,7 @@ def register_error_handlers(app):
         response.status_code = e.code
         return response
 
-    # 3. その他の予期せぬPython例外のハンドリング（最終的な安全網）
+    # 4. その他の予期せぬPython例外のハンドリング（最終的な安全網）
     @app.errorhandler(Exception)
     def handle_generic_exception(error):
         # ここに到達するエラーは、下位レイヤーでログ済みの場合が多いが、

@@ -12,3 +12,7 @@ class IUserRepository(ABC):
     @abstractmethod
     def get_users(self, limit: int = 100) -> List[User]:
         raise NotImplementedError
+
+    @abstractmethod
+    def add_user(self, user: User) -> User:
+        raise NotImplementedError
