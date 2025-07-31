@@ -60,6 +60,20 @@ def some_business_logic(user_id: int):
         raise
 ```
 
+#### 3. 開発環境での色付きログと詳細なトレースバック
+
+環境変数 `IS_DEBUG` を `true` に設定することで、開発環境向けのログ出力が有効になります。
+
+*   **色付きコンソール出力**: `colorama` を使用して、ログレベルに応じた色付きの出力が行われます。
+*   **詳細なトレースバック**: エラー発生時に `logger.error(..., exc_info=True)` とすることで、詳細なスタックトレースがログに含まれます。
+
+**設定方法:**
+.env
+
+```
+IS_DEBUG=true
+```
+
 ### ログ出力例
 
 上記コードが `/users/` へのPOSTリクエストで実行された場合、コンソールには以下のようなJSONログが出力されます。
@@ -78,4 +92,15 @@ def some_business_logic(user_id: int):
   "method": "POST",
   "path": "/users/"
 }
+```
+
+`IS_DEBUG=true` の場合のエラーログ例:
+
+```
+[error    ] ZeroDivisionErrorが発生しました。      method=GET path=/error remote_addr=127.0.0.1 request_id=XXXX
+Traceback (most recent call last):
+  File "/Users/koz/Documents/my-ws/study/python/learn-flask/app.py", line XX, in trigger_error
+    1 / 0  # ZeroDivisionErrorを意図的に発生させる
+    ~~^~~
+ZeroDivisionError: division by zero
 ```
