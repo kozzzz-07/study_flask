@@ -22,12 +22,13 @@
 -   **ファイル:** `services/user_service.py` など
 -   **責務:** アプリケーションのユースケース（ビジネスロジック）を実行します。複数のリポジトリを連携させたり、ドメインモデルに定義されたビジネスルールを呼び出したりします。
 -   **データの扱い:**
+    -   Route層から入力として**DTO**を受け取ります（例: `UserCreateDTO`）。
     -   Repository層から**ドメインモデル**を受け取ります。
-    -   ビジネスロジックを適用した後、Route層に渡すためにドメインモデルを**DTO**に変換します。
+    -   ビジネスロジックを適用した後、Route層に渡すためにドメインモデルを**DTO**（例: `UserResponse`）に変換します。
 -   **依存関係:**
     -   抽象化されたリポジトリインターフェース（`IUserRepository`）。
     -   ドメインモデル（`User`）。
-    -   DTO（`UserResponse`）。
+    -   DTO（`UserResponse`, `UserCreateDTO`）。
 
 ### 2.3. Repository層 (Infrastructure Layer)
 -   **ファイル:** `infra/repository/user_repository.py` など
@@ -48,8 +49,10 @@
 -   **特徴:** Pydantic `BaseModel` を使用し、データの型定義とバリデーションを強力にサポートします。
 
 ### 3.2. DTO (Data Transfer Object) (`application/ports/user_dto.py`)
--   **例:** `UserResponse` クラス
--   **役割:** 層間（特にService層とRoute層の間）でデータを転送するための専用オブジェクトです。APIのレスポンス形式とドメインモデルの構造を分離します。
+-   **例:** `UserResponse`, `UserCreateDTO` クラス
+-   **役割:** 層間でデータを転送するための専用オブジェクトです。特に、Route層とService層の間で使用されます。APIのスキーマ（リクエスト/レスポンス）と、内部のドメインモデルの構造を明確に分離します。
+    -   `UserCreateDTO`: クライアントからの入力（リクエストボディ）を検証し、Service層に渡すために使用します。
+    -   `UserResponse`: Service層からRoute層へ、クライアントに返すデータを渡すために使用します。
 -   **特徴:** Pydantic `BaseModel` を使用し、APIのスキーマ定義としても機能します。ドメインモデルの内部情報（例: パスワードハッシュ）を外部に公開しないように制御できます。
 
 ### 3.3. ポートとアダプター (Ports and Adapters / Hexagonal Architecture)
