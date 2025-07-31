@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+import os
+from flask import Flask, request, jsonify, send_from_directory
 from dotenv import load_dotenv
 import uuid
 
@@ -15,7 +16,7 @@ load_dotenv()
 setup_logging()
 logger = get_logger(__name__)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 
 logger.info("Flask application started.")
 
@@ -55,10 +56,14 @@ def after_request(response):
     return response
 
 
-@app.route("/")
-def hello_world():
-    logger.info("Hello World endpoint was called.")
-    return "<p>Hello, World!</p>"
+# 例えば、Reactなどをbuildしたファイルをstatic配下に配置した場合、flaskから配信できる
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + "/" + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, "index.html")
 
 
 @app.route("/error")
