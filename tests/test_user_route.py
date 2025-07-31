@@ -2,7 +2,7 @@ import pytest
 from flask import Flask
 from unittest.mock import patch
 from route.user import user_bp
-from application.ports.user_dto import UserResponse  # DTOをインポート
+from application.ports.user_dto import UserResponse, UserCreateDTO  # DTOをインポート
 
 
 @pytest.fixture
@@ -34,3 +34,24 @@ def test_get_users(client):
 
         assert response.status_code == 200
         assert response.json == expected_json
+
+
+def test_add_user(client):
+    user_data = {"name": "New User", "age": 28, "nickname": "Newbie"}
+    expected_response_dto = UserResponse(id=3, name="New User", age=28, nickname="Newbie")
+
+    with patch('route.user.get_user_service') as MockGetUserService:
+        mock_user_service_instance = MockGetUserService.return_value
+        mock_user_service_instance.add_user.return_value = expected_response_dto
+
+        response = client.post('/users', json=user_data)
+
+        assert response.status_code == 201
+        assert response.json == expected_response_dto.model_dump()
+        mock_user_service_instance.add_user.assert_called_once()
+        # add_userがUserCreateDTOで呼ばれたことを確認
+        called_with_dto = mock_user_service_instance.add_user.call_args[0][0]
+        assert isinstance(called_with_dto, UserCreateDTO)
+        assert called_with_dto.name == user_data["name"]
+        assert called_with_dto.age == user_data["age"]
+        assert called_with_dto.nickname == user_data["nickname"]
